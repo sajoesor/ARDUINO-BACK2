@@ -17,7 +17,8 @@ const registroSchema = new mongoose.Schema({
 });
 const Registro = mongoose.model("Registro", registroSchema);
 
-app.post("/registro", async (req, res) => {
+// POST /api/registro
+app.post("/", async (req, res) => {
   const { boton } = req.body;
   if (!["arriba", "abajo", "izquierda", "derecha"].includes(boton)) {
     return res.status(400).json({ error: "Botón inválido" });
@@ -28,10 +29,10 @@ app.post("/registro", async (req, res) => {
   res.status(201).json({ message: "Registro guardado correctamente" });
 });
 
-app.get("/registros", async (req, res) => {
+// GET /api/registro
+app.get("/", async (req, res) => {
   const registros = await Registro.find({}, { __v: 0 });
   res.json(registros);
 });
 
-// Exporta la app como función serverless
 module.exports = serverless(app);
