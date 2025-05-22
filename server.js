@@ -17,7 +17,7 @@ const registroSchema = new mongoose.Schema({
 });
 const Registro = mongoose.model("Registro", registroSchema);
 
-app.post("/api/registro", async (req, res) => {
+app.post("/registro", async (req, res) => {
   const { boton } = req.body;
   if (!["arriba", "abajo", "izquierda", "derecha"].includes(boton)) {
     return res.status(400).json({ error: "Botón inválido" });
@@ -28,7 +28,7 @@ app.post("/api/registro", async (req, res) => {
   res.status(201).json({ message: "Registro guardado correctamente" });
 });
 
-app.get("/api/registros", async (req, res) => {
+app.get("/registros", async (req, res) => {
   const registros = await Registro.find({}, { __v: 0 });
   res.json(registros);
 });
