@@ -1,20 +1,28 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-require('dotenv').config();
 
+// Crear instancia de Express
 const app = express();
+
+// Middlewares
 app.use(cors());
 app.use(express.json());
 
-// Conexión a MongoDB
-mongoose.connect(process.env.MONGO_URI, {
+// Conectar a MongoDB
+const mongoUri = process.env.MONGO_URI;
+
+if (!mongoUri) {
+  throw new Error('Falta la variable de entorno MONGO_URI');
+}
+
+mongoose.connect(mongoUri, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 }).then(() => console.log('MongoDB conectado'))
   .catch(err => console.error('Error de conexión a MongoDB:', err));
 
-// Esquema de botón
+// Definir esquema de Mongo
 const registroSchema = new mongoose.Schema({
   boton: String,
   hora: String
@@ -22,8 +30,8 @@ const registroSchema = new mongoose.Schema({
 
 const Registro = mongoose.model('Registro', registroSchema);
 
-// POST /registro – recibe botón desde Arduino
-app.post('/registro', async (req, res) => {
+// Ruta POST /api/registro
+app.post('/api/registro', async (req, res) => {
   const { boton } = req.body;
 
   if (!['arriba', 'abajo', 'izquierda', 'derecha'].includes(boton)) {
@@ -38,13 +46,11 @@ app.post('/registro', async (req, res) => {
   res.status(201).json({ message: 'Registro guardado correctamente' });
 });
 
-// GET /registros – consulta todos los registros
-app.get('/registros', async (req, res) => {
+// Ruta GET /api/registros
+app.get('/api/registros', async (req, res) => {
   const registros = await Registro.find({}, { __v: 0 });
   res.json(registros);
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Servidor corriendo en http://localhost:${PORT}`);
-});
+// Exportar app para que Vercel lo use como handler
+module.exports = app;
